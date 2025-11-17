@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Happy Birthday Mom 💖</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Poppins", sans-serif;
+    }
+
+    body {
+      height: 100vh;
+      overflow: hidden;
+      background: linear-gradient(135deg, #ffb6c1, #a8e6cf);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      animation: gradientShift 12s ease infinite;
+      background-size: 200% 200%;
+    }
+
+    @keyframes gradientShift {
+      0% {
+        background-position: 0% 50%;
+      }
+      50% {
+        background-position: 100% 50%;
+      }
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    /* blurred floaty balls */
+    .ball {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(40px);
+      opacity: 0.5;
+      animation: float 10s ease-in-out infinite alternate;
+    }
+
+    @keyframes float {
+      0% {
+        transform: translateY(0) translateX(0);
+      }
+      50% {
+        transform: translateY(-60px) translateX(40px);
+      }
+      100% {
+        transform: translateY(0) translateX(0);
+      }
+    }
+
+    /* glowing sparkles */
+    .sparkle {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 50%;
+      animation: sparkleAnim 6s ease-in-out infinite;
+    }
+
+    @keyframes sparkleAnim {
+      0%, 100% {
+        transform: scale(0.8);
+        opacity: 0.5;
+      }
+      50% {
+        transform: scale(1.2);
+        opacity: 1;
+      }
+    }
+
+    /* birthday card */
+    .card {
+      position: relative;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(20px);
+      border-radius: 25px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+      text-align: center;
+      padding: 3rem 2rem;
+      z-index: 2;
+      width: 90%;
+      max-width: 420px;
+      color: #fff;
+      animation: fadeIn 2s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(40px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    h1 {
+      font-size: 2.2em;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: #fff;
+      text-shadow: 0 0 15px rgba(255,255,255,0.6);
+    }
+
+    p {
+      font-size: 1.1em;
+      line-height: 1.5;
+      margin-bottom: 1.8rem;
+      color: rgba(255,255,255,0.9);
+    }
+
+    footer {
+      font-size: 0.9em;
+      color: rgba(255,255,255,0.8);
+      letter-spacing: 1px;
+      animation: shimmer 3s linear infinite;
+    }
+
+    @keyframes shimmer {
+      0% {
+        opacity: 0.7;
+      }
+      50% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0.7;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Background balls -->
+  <div class="ball" style="width:160px; height:160px; top:10%; left:10%; background:#ffb6c1; animation-delay:0s;"></div>
+  <div class="ball" style="width:220px; height:220px; top:60%; left:70%; background:#a8e6cf; animation-delay:3s;"></div>
+  <div class="ball" style="width:120px; height:120px; top:80%; left:25%; background:#fbd1ff; animation-delay:5s;"></div>
+  <div class="ball" style="width:180px; height:180px; top:20%; left:80%; background:#b2ebf2; animation-delay:2s;"></div>
+  <div class="ball" style="width:100px; height:100px; top:75%; left:5%; background:#ffe4e1; animation-delay:4s;"></div>
+
+  <!-- sparkles -->
+  <div class="sparkle" style="width:8px; height:8px; top:20%; left:40%; animation-delay:1s;"></div>
+  <div class="sparkle" style="width:6px; height:6px; top:50%; left:20%; animation-delay:2s;"></div>
+  <div class="sparkle" style="width:10px; height:10px; top:70%; left:60%; animation-delay:3s;"></div>
+  <div class="sparkle" style="width:7px; height:7px; top:30%; left:80%; animation-delay:4s;"></div>
+
+  <!-- Card -->
+  <div class="card">
+    <h1>Happy Birthday Mom 💖</h1>
+    <p>Thank you for being my forever home 💖</p>
+    <footer>— by Misachi ✨</footer>
+  </div>
+</body>
+</html>

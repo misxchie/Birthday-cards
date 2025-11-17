@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Happy Birthday Mom 💖 — Misachi</title>
+<style>
+  :root{
+    --bg1:#ffd7e0; /* pink */
+    --bg2:#bff7e0; /* mint */
+    --glass: rgba(255,255,255,0.14);
+    --glass-strong: rgba(255,255,255,0.22);
+    --text: #ffffff;
+    --accent: rgba(255,255,255,0.95);
+    --glow-col1: 255,182,193; /* pink rgb */
+    --glow-col2: 168,230,207; /* mint rgb */
+  }
+
+  /* Reset */
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    min-height:100vh;
+    overflow:hidden;
+    display:grid;
+    place-items:center;
+    background: linear-gradient(135deg,var(--bg1),var(--bg2));
+    background-size:200% 200%;
+    animation: bgShift 14s linear infinite;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+  }
+
+  @keyframes bgShift{
+    0%{background-position:0% 50%}
+    50%{background-position:100% 50%}
+    100%{background-position:0% 50%}
+  }
+
+  /* Canvas sits behind everything */
+  #bgCanvas{
+    position:fixed;
+    inset:0;
+    z-index:0;
+    width:100%;
+    height:100%;
+    display:block;
+    pointer-events:none;
+  }
+
+  /* Centered card (glass) */
+  .card{
+    position:relative;
+    z-index:5;
+    width:min(92%,460px);
+    padding:2.4rem 2rem;
+    border-radius:20px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.11), rgba(255,255,255,0.06));
+    box-shadow: 0 10px 40px rgba(2,6,23,0.28), 0 2px 10px rgba(0,0,0,0.12);
+    backdrop-filter: blur(14px) saturate(120%);
+    border: 1px solid rgba(255,255,255,0.12);
+    text-align:center;
+    color:var(--text);
+    transition: transform .35s cubic-bezier(.2,.9,.2,1), box-shadow .35s;
+  }
+  .card:hover{ transform: translateY(-8px) scale(1.006); box-shadow: 0 24px 64px rgba(2,6,23,0.36); }
+
+  h1{
+    font-size:clamp(1.6rem,3.6vw,2.4rem);
+    letter-spacing: -0.02em;
+    margin-bottom:.6rem;
+    line-height:1.05;
+    color:var(--accent);
+    text-shadow:
+      0 6px 26px rgba(var(--glow-col1),0.08),
+      0 0 18px rgba(var(--glow-col2),0.04);
+  }
+
+  p.lead{
+    margin:0 auto 1.4rem;
+    max-width:36ch;
+    color: rgba(255,255,255,0.95);
+    font-size:clamp(.98rem,2.3vw,1.06rem);
+    line-height:1.5;
+    opacity:0.98;
+  }
+
+  footer{
+    font-size:.88rem;
+    color: rgba(255,255,255,0.85);
+    opacity:.95;
+    margin-top:8px;
+    letter-spacing:.6px;
+  }
+
+  /* little accent border glow */
+  .card::before{
+    content:"";
+    position:absolute;
+    inset: -1px;
+    border-radius:inherit;
+    background: linear-gradient(90deg, rgba(var(--glow-col1),0.24), rgba(var(--glow-col2),0.24));
+    filter: blur(18px);
+    z-index:-1;
+    opacity:0.9;
+    transform: scale(.98);
+    transition:opacity .3s;
+  }
+
+  /* tiny shimmer on footer text */
+  .shimmer {
+    display:inline-block;
+    background: linear-gradient(90deg, rgba(255,255,255,0.75), rgba(255,255,255,0.2));
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    animation: shimmerMove 3.2s linear infinite;
+    background-size:200% auto;
+  }
+  @keyframes shimmerMove{
+    0% { background-position: 0% }
+    100% { background-position: 200% }
+  }
+
+  /* small responsive spacing for mobile */
+  @media (max-width:420px){
+    .card{ padding:1.6rem 1.2rem; border-radius:16px }
+    h1{ font-size:1.6rem }
+  }
+</style>
+</head>
+<body>
+
+<!-- Canvas for balls, trails & particles -->
+<canvas id="bgCanvas"></canvas>
+
+<!-- Glass card -->
+<div class="card" role="region" aria-label="Birthday message">
+  <h1>Happy Birthday Mom 💖</h1>
+  <p class="lead">Thank you for being my forever home 💖</p>
+  <footer><span class="shimmer">— by Misachi ✨</span></footer>
+</div>
+
+<script>
+/* ---------- Animated background canvas ----------
+   Features:
+    - soft, blurred balls with glow
+    - faster randomized drift + gentle bounces
+    - motion trails via canvas fade technique
+    - tiny twinkling dust particles
+--------------------------------------------------*/
+
+const canvas = document.getElementById('bgCanvas');
+const ctx = canvas.getContext('2d', { alpha: true });
+
+let DPR = Math.max(1, window.devicePixelRatio || 1);
+let W = 0, H = 0;
+
+function resize(){
+  DPR = Math.max(1, window.devicePixelRatio || 1);
+  W = canvas.width = Math.floor(window.innerWidth * DPR);
+  H = canvas.height = Math.floor(window.innerHeight * DPR);
+  canvas.style.width = window.innerWidth+'px';
+  canvas.style.height = window.innerHeight+'px';
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+}
+window.addEventListener('resize', resize, {passive:true});
+resize();
+
+/* utility */
+function rand(min,max){ return Math.random()*(max-min)+min }
+
+/* balls (blobs) - create fast, varied motion */
+const BLOBS = [];
+const BLOBS_COUNT = Math.round(Math.max(4, window.innerWidth / 240));
+
+for(let i=0;i<BLOBS_COUNT;i++){
+  const size = rand(70, 260);
+  BLOBS.push({
+    x: rand(0, window.innerWidth),
+    y: rand(0, window.innerHeight),
+    vx: rand(-0.3,0.6) * (Math.random() < .5 ? -1 : 1) * (rand(0.6,2.2)),
+    vy: rand(-0.2,0.6) * (Math.random() < .5 ? -1 : 1) * (rand(0.6,1.8)),
+    r: size,
+    hue: i%2==0 ? {r:255,g:182,b:193} : {r:168,g:230,b:207}, // swap pink/mint
+    pulse: rand(0.8,1.2),
+    phase: rand(0,Math.PI*2),
+    speedMult: rand(0.9,1.8)
+  });
+}
+
+/* dust particles (tiny twinkles) */
+const DUST = [];
+const DUST_COUNT = Math.round(Math.max(30, window.innerWidth/28));
+for(let i=0;i<DUST_COUNT;i++){
+  DUST.push({
+    x: rand(0,window.innerWidth),
+    y: rand(0,window.innerHeight),
+    size: rand(0.6,2.6),
+    alpha: rand(0.12,0.9),
+    blink: rand(1.2,3.8),
+    t: rand(0, Math.PI*2)
+  });
+}
+
+/* draw a blurred radial blob with soft gradient */
+function drawBlob(b){
+  const {x,y,r,hue} = b;
+  const grd = ctx.createRadialGradient(x, y, r*0.02, x, y, r);
+  grd.addColorStop(0, `rgba(${hue.r},${hue.g},${hue.b},0.36)`);
+  grd.addColorStop(0.35, `rgba(${hue.r},${hue.g},${hue.b},0.20)`);
+  grd.addColorStop(0.8, `rgba(${hue.r},${hue.g},${hue.b},0.06)`);
+  grd.addColorStop(1, `rgba(${hue.r},${hue.g},${hue.b},0)`);
+  ctx.beginPath();
+  ctx.fillStyle = grd;
+  ctx.arc(x,y,r,0,Math.PI*2);
+  ctx.fill();
+}
+
+/* main animation loop */
+let last = performance.now();
+function loop(now){
+  const dt = (now - last) / 1000;
+  last = now;
+
+  // fade canvas slightly to create trailing effect (motion blur)
+  ctx.save();
+  ctx.globalCompositeOperation = 'source-over';
+  // alpha depends on dt to keep trails consistent across frame rates
+  ctx.fillStyle = `rgba(10,8,12, ${0.12 + Math.min(0.22, dt * 0.6)})`;
+  ctx.fillRect(0,0, canvas.width, canvas.height);
+  ctx.restore();
+
+  // add subtle glow additive for blobs
+  ctx.globalCompositeOperation = 'lighter';
+
+  // update & draw blobs
+  for(const b of BLOBS){
+    // oscillating pulse
+    b.phase += 0.9 * dt * b.speedMult;
+    const pulse = 1 + Math.sin(b.phase)*0.06 * b.pulse;
+
+    // velocity jitter + gentle bounds bounce
+    b.x += b.vx * dt * 120 * b.speedMult;
+    b.y += b.vy * dt * 90 * b.speedMult;
+    b.vx += Math.sin(now*0.001 + b.phase)*0.03 * (Math.random()-0.5);
+    b.vy += Math.cos(now*0.001 + b.phase)*0.03 * (Math.random()-0.5);
+
+    // bounce off edges with soft wrap
+    if(b.x < -b.r) b.x = window.innerWidth + b.r;
+    if(b.x > window.innerWidth + b.r) b.x = -b.r;
+    if(b.y < -b.r) b.y = window.innerHeight + b.r;
+    if(b.y > window.innerHeight + b.r) b.y = -b.r;
+
+    // dynamic draw radius
+    const drawR = b.r * pulse * (0.92 + Math.sin(b.phase*0.9)*0.04);
+    // multiple layered draws for glow
+    ctx.save();
+    ctx.translate(0,0);
+    ctx.globalAlpha = 0.9;
+    // stronger center
+    ctx.filter = 'blur(22px)';
+    drawBlob({...b, r: drawR*0.6});
+    ctx.filter = 'blur(38px)';
+    drawBlob({...b, r: drawR});
+    ctx.filter = 'none';
+    ctx.restore();
+  }
+
+  // dust particles (twinkles)
+  ctx.globalCompositeOperation = 'source-over';
+  for(const d of DUST){
+    d.t += dt * (1/d.blink) * 1.6;
+    const a = 0.2 + 0.8 * (0.5 + 0.5*Math.sin(d.t));
+    const size = d.size * (0.9 + 0.6*Math.sin(d.t*0.7));
+    ctx.beginPath();
+    ctx.fillStyle = `rgba(255,255,255,${a * d.alpha})`;
+    ctx.arc(d.x, d.y, size, 0, Math.PI*2);
+    ctx.fill();
+  }
+
+  // restore blend mode
+  ctx.globalCompositeOperation = 'source-over';
+
+  requestAnimationFrame(loop);
+}
+
+// kick off loop
+requestAnimationFrame(loop);
+
+/* subtle parallax based on mouse for extra depth (mobile uses deviceorientation fallback) */
+let px = window.innerWidth/2, py = window.innerHeight/2;
+window.addEventListener('mousemove', e => { px = e.clientX; py = e.clientY; });
+window.addEventListener('touchmove', e => { if(e.touches[0]) { px = e.touches[0].clientX; py = e.touches[0].clientY; } }, {passive:true});
+
+/* optional: device orientation movement (very subtle) */
+window.addEventListener('deviceorientation', ev => {
+  const x = ev.gamma || 0, y = ev.beta || 0;
+  px = (window.innerWidth/2) + x*2;
+  py = (window.innerHeight/2) + y*1.4;
+});
+
+/* adaptive repositioning every few seconds to keep motion lively */
+setInterval(()=>{
+  for(const b of BLOBS){
+    // small random boost to velocity occasionally
+    b.vx += rand(-0.35,0.35);
+    b.vy += rand(-0.25,0.25);
+  }
+  // shuffle dust positions lightly
+  for(const d of DUST) {
+    if(Math.random()<0.08){ d.x = rand(0,window.innerWidth); d.y = rand(0,window.innerHeight); }
+  }
+}, 1800);
+
+/* ensure canvas resizes on orientation changes / initial layout */
+setTimeout(resize, 120);
+</script>
+</body>
+</html>
